@@ -1,64 +1,90 @@
-let menu = prompt("Seleccione su pizza:\n1. Muzzarella ($1000)\n2. Especial jamon ($1500)\n3. Especial morron ($1500)\n4. Especial anochoas ($1500)\n5. Completa jamon, morron y anchoas ($1900)");
-let cantidad = prompt("Ingrese la cantidad de pizzas que desea ordenar:");
-
 let precios = {
-  1: 1000,
-  2: 1500,
-  3: 1500,
-  4: 1500,
-  5: 1900
+  "1": 1000,
+  "2": 1500,
+  "3": 1500,
+  "4": 1500,
+  "5": 1900,
 };
 
-let precio = precios[menu] || 0;
-let total = precio * cantidad;
+let menuSelect = document.getElementById("menu");
+let cantidadInput = document.getElementById("cantidad");
+let formaDePagoEfectivoInput = document.getElementById("efectivo");
+let formaDePagoTarjetaInput = document.getElementById("tarjeta");
+let agregarDestinatarioButton = document.getElementById("agregarDestinatario");
+let listaDestinatarios = document.getElementById("listaDestinatarios");
+let agregarPostreButton = document.getElementById("agregarPostre");
+let listaPostres = document.getElementById("listaPostres");
+let letraInicialInput = document.getElementById("letraInicial");
+let filtrarDestinatariosButton = document.getElementById("filtrarDestinatarios");
+let precioTotalText = document.getElementById("total");
+let tiempoEstimadoText = document.getElementById("tiempoEstimado");
 
-let formaDePago = prompt("¿Desea pagar con tarjeta o en efectivo?");
-if (formaDePago === "tarjeta") {
-  total *= 1.1;
+function calcularTotal() {
+  let menu = menuSelect.value;
+  let precio = precios[menu] || 0;
+  let total = precio * cantidadInput.value;
+  let tiempoDeEntrega = 0;
+
+  if (total >= 1000 && total <= 1500) {
+    tiempoDeEntrega = 30;
+  } else if (total >= 1501 && total <= 1900) {
+    tiempoDeEntrega = 45;
+  } else if (total > 1900) {
+    tiempoDeEntrega = 60;
+  }
+
+  if (formaDePagoTarjetaInput.checked) {
+    total *= 1.1;
+  }
+
+  precioTotalText.textContent = "$" + total;
+  tiempoEstimadoText.textContent = tiempoDeEntrega + " minutos";
 }
-
-let tiempoDeEntrega = {
-  1: 20,
-  2: 30,
-  3: 30,
-  4: 30,
-  5: 30
-};
-
-let tiempoEstimado = tiempoDeEntrega[menu] * cantidad;
-
-let nombresDestinatarios = [];
-let saboresSeleccionados = [];
 
 function agregarDestinatario() {
-    let respuesta = prompt("¿Desea agregar un destinatario? (S/N)").toUpperCase();
-    if (respuesta === "S") {
-      let nombre = prompt("Ingrese el nombre del destinatario:");
-      nombresDestinatarios.push(nombre);
-      alert(`El destinatario de la pizza es: ${nombresDestinatarios.join(", ")}`);
-      saboresSeleccionados.push(menu);
-      agregarDestinatario();
-    }
-  }
-  
-  agregarDestinatario();
-  
+  let destinatario = prompt("Ingrese el nombre del destinatario:");
 
-while (true) {
-  let respuesta = prompt("¿Desea agregar un postre? (S/N)").toUpperCase();
-  if (respuesta === "S") {
-    let postre = prompt("Ingrese el postre que desea agregar:");
-    let precioPostre = 500;
-    let cantidadPostre = prompt("Ingrese la cantidad de postres que desea agregar:");
-    let totalPostres = precioPostre * cantidadPostre;
-    total += totalPostres;
-    alert(`Se han agregado ${cantidadPostre} ${postre} a su orden. El precio total de su orden ahora es: $${total}.`);
-  } else {
-    break;
+  if (destinatario) {
+    let li = document.createElement("li");
+    li.textContent = destinatario;
+    listaDestinatarios.appendChild(li);
   }
 }
 
-let letraInicial = prompt("Ingrese la letra inicial por la que quiere filtrar los nombres de destinatarios:");
-let nombresFiltrados = nombresDestinatarios.filter(nombre => nombre.charAt(0).toUpperCase() === letraInicial.toUpperCase());
-alert(`Los destinatarios cuyos nombres comienzan con la letra ${letraInicial.toUpperCase()} son: ${nombresFiltrados.join(", ")}.`);
-alert(`El precio total de su orden es: $${total}, y el tiempo de entrega estimado es de ${tiempoEstimado} minutos.`);
+function agregarPostre() {
+  let postre = prompt("Ingrese el nombre del postre:");
+
+  if (postre) {
+    let li = document.createElement("li");
+    let cantidadPostreInput = document.createElement("input");
+    cantidadPostreInput.type = "number";
+    cantidadPostreInput.min = "1";
+    cantidadPostreInput.max = "10";
+    cantidadPostreInput.value = "1";
+
+    li.textContent = postre + " ";
+    li.appendChild(cantidadPostreInput);
+
+    listaPostres.appendChild(li);
+  }
+}
+
+function filtrarDestinatarios() {
+  let letraInicial = letraInicialInput.value.toUpperCase();
+
+  for (let i = 0; i < listaDestinatarios.children.length; i++) {
+    let li = listaDestinatarios.children[i];
+    let nombreDestinatario = li.textContent.trim().toUpperCase();
+
+    if (nombreDestinatario.startsWith(letraInicial)) {
+      li.style.display = "";
+    } else {
+      li.style.display = "none";
+    }
+  }
+}
+
+menuSelect.addEventListener("change", calcularTotal);
+cantidadInput.addEventListener("input", calcularTotal);
+formaDePagoEfectivoInput.addEventListener("change", calcularTotal);
+formaDePago
