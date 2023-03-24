@@ -2,9 +2,12 @@
 <html>
 <head>
 	<title>Pizzeria</title>
+	<link rel="stylesheet" href="./style.css">
+	<script src="https://cdn.jsdelivr.net/npm/luxon@2.0.0/build/global/luxon.min.js"></script>
+
 </head>
 <body>
-	<h1>Pizzeria</h1>
+	<h1>Tu pizza a un click</h1>
 	<label>Seleccione su pizza:</label>
 	<select id="menu">
 		<option value="1">Muzzarella ($1000)</option>
@@ -17,6 +20,12 @@
 	<label>Cantidad de pizzas:</label>
 	<input type="number" id="cantidad">
 	<br>
+	<label for="fecha">Fecha de entrega:</label>
+<input type="date" id="fecha" name="fecha">
+
+<label for="hora">Hora de entrega:</label>
+<input type="time" id="hora" name="hora">
+<br>
 	<label>Forma de pago:</label>
 	<br>
 	<input type="radio" id="tarjeta" name="formaDePago" value="tarjeta">
@@ -27,14 +36,27 @@
 	<button id="calcularTotal">Calcular Total</button>
 	<br>
 	<br>
-	<h2>Destinatarios</h2>
-	<button id="agregarDestinatario">Agregar Destinatario</button>
+	<h2>Agregar destinatario</h2>
+	<input id="destinatarioInput" type="text" placeholder="Nombre del destinatario">
+	<button id="agregarDestinatarioButton">Agregar</button>
 	<ul id="listaDestinatarios"></ul>
+	
 	<br>
 	<br>
-	<h2>Postres</h2>
-	<button id="agregarPostre">Agregar Postre</button>
+	<h2>Agregar postre</h2>
+	<form id="formPostre">
+		<label for="nombrePostre">Nombre:</label>
+		<input type="text" id="nombrePostre" name="nombrePostre">
+
+		<label for="cantidadPostre">Cantidad:</label>
+		<input type="number" id="cantidadPostre" name="cantidadPostre" min="1" max="10" value="1">
+
+		<button type="submit">Agregar</button>
+	</form>
+
+	<h2>Lista de postres</h2>
 	<ul id="listaPostres"></ul>
+
 	<br>
 	<br>
 	<label>Letra inicial para filtrar destinatarios:</label>
@@ -43,11 +65,12 @@
 	<br>
 	<br>
 	<label>Total:</label>
-	<label id="total"></label>
+	<span id="totalSpan"></span>
 	<br>
-	<label>Tiempo de entrega estimado:</label>
-	<label id="tiempoEstimado"></label>
-	<br>
+	<span>Fecha de entrega: </span><span id="fechaEntregaSpan"></span><br>
+<span>Hora de entrega: </span><span id="horaEntregaSpan"></span>
+
 	<script src="./index.js"></script>
+	<script src="./index.json"></script>
 </body>
 </html>

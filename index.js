@@ -1,90 +1,81 @@
-let precios = {
-  "1": 1000,
-  "2": 1500,
-  "3": 1500,
-  "4": 1500,
-  "5": 1900,
-};
+// Obtener elementos del DOM
+const menu = document.getElementById("menu");
+const cantidad = document.getElementById("cantidad");
+const tarjeta = document.getElementById("tarjeta");
+const calcularTotalBtn = document.getElementById("calcularTotal");
+const destinatarioInput = document.getElementById("destinatarioInput");
+const agregarDestinatarioBtn = document.getElementById("agregarDestinatarioButton");
+const listaDestinatarios = document.getElementById("listaDestinatarios");
+const formPostre = document.getElementById("formPostre");
+const nombrePostreInput = document.getElementById("nombrePostre");
+const cantidadPostreInput = document.getElementById("cantidadPostre");
+const listaPostres = document.getElementById("listaPostres");
+const letraInicialInput = document.getElementById("letraInicial");
+const filtrarDestinatariosBtn = document.getElementById("filtrarDestinatarios");
+const totalSpan = document.getElementById("totalSpan");
+const tiempoSpan = document.getElementById("tiempoSpan");
 
-let menuSelect = document.getElementById("menu");
-let cantidadInput = document.getElementById("cantidad");
-let formaDePagoEfectivoInput = document.getElementById("efectivo");
-let formaDePagoTarjetaInput = document.getElementById("tarjeta");
-let agregarDestinatarioButton = document.getElementById("agregarDestinatario");
-let listaDestinatarios = document.getElementById("listaDestinatarios");
-let agregarPostreButton = document.getElementById("agregarPostre");
-let listaPostres = document.getElementById("listaPostres");
-let letraInicialInput = document.getElementById("letraInicial");
-let filtrarDestinatariosButton = document.getElementById("filtrarDestinatarios");
-let precioTotalText = document.getElementById("total");
-let tiempoEstimadoText = document.getElementById("tiempoEstimado");
+// Definir variables globales para el costo y tiempo de entrega
+let costoTotal = 0;
+let tiempoTotal = 0;
 
-function calcularTotal() {
-  let menu = menuSelect.value;
-  let precio = precios[menu] || 0;
-  let total = precio * cantidadInput.value;
-  let tiempoDeEntrega = 0;
+// Calcular el costo y tiempo de entrega
+function calcularCostoYTiempo() {
+  const pizzaId = menu.value;
+  const pizza = menuOptions.find(pizza => pizza.id === pizzaId);
+  const cantidadPizzas = parseInt(cantidad.value);
+  let precioTotal = pizza.price * cantidadPizzas;
+  let tiempoEntrega = cantidadPizzas * 10; // cada pizza tarda 10 minutos en hacerse
 
-  if (total >= 1000 && total <= 1500) {
-    tiempoDeEntrega = 30;
-  } else if (total >= 1501 && total <= 1900) {
-    tiempoDeEntrega = 45;
-  } else if (total > 1900) {
-    tiempoDeEntrega = 60;
-  }
+  // Obtener fecha y hora actual
+  const ahora = luxon.DateTime.local();
+  
+  // Calcular fecha y hora de entrega sumando el tiempo de entrega
+  const entrega = ahora.plus({ minutes: tiempoEntrega });
+  const fechaEntrega = entrega.toFormat("DD/MM/YYYY");
+  const horaEntrega = entrega.toFormat("HH:mm");
 
-  if (formaDePagoTarjetaInput.checked) {
-    total *= 1.1;
-  }
-
-  precioTotalText.textContent = "$" + total;
-  tiempoEstimadoText.textContent = tiempoDeEntrega + " minutos";
+  // Actualizar elementos del DOM con la fecha y hora de entrega
+  const fechaEntregaSpan = document.getElementById("fechaEntregaSpan");
+  const horaEntregaSpan = document.getElementById("horaEntregaSpan");
+  fechaEntregaSpan.innerText = fechaEntrega;
+  horaEntregaSpan.innerText = horaEntrega;
 }
 
-function agregarDestinatario() {
-  let destinatario = prompt("Ingrese el nombre del destinatario:");
 
-  if (destinatario) {
-    let li = document.createElement("li");
-    li.textContent = destinatario;
-    listaDestinatarios.appendChild(li);
+  // Si se paga con tarjeta, se agrega un 10% de recargo
+  if (tarjeta.checked) {
+    precioTotal = precioTotal * 1.1;
   }
+
+  // Actualizar variables globales y elementos del DOM
+  costoTotal = precioTotal;
+  tiempoTotal = tiempoEntrega;
+  totalSpan.innerText = `$${precioTotal.toFixed(2)}`;
+  tiempoSpan.innerText = `${tiempoEntrega} minutos`;
+
+
+// Generar opciones para el select del menú de pizzas
+function generarOpcionesMenu(menuOptions) {
+  let opciones = "";
+
+  for (const pizza of menuOptions) {
+    opciones += `<option value="${pizza.id}">${pizza.name} ($${pizza.price})</option>`;
+  }
+
+  menu.innerHTML = opciones;
 }
 
-function agregarPostre() {
-  let postre = prompt("Ingrese el nombre del postre:");
+// Cargar datos del menú desde un archivo JSON
+fetch('index.json')
+  .then(response => response.json())
+  .then(data => {
+    const menuOptions = data.menu;
+    generarOpcionesMenu(menuOptions);
 
-  if (postre) {
-    let li = document.createElement("li");
-    let cantidadPostreInput = document.createElement("input");
-    cantidadPostreInput.type = "number";
-    cantidadPostreInput.min = "1";
-    cantidadPostreInput.max = "10";
-    cantidadPostreInput.value = "1";
-
-    li.textContent = postre + " ";
-    li.appendChild(cantidadPostreInput);
-
-    listaPostres.appendChild(li);
-  }
-}
-
-function filtrarDestinatarios() {
-  let letraInicial = letraInicialInput.value.toUpperCase();
-
-  for (let i = 0; i < listaDestinatarios.children.length; i++) {
-    let li = listaDestinatarios.children[i];
-    let nombreDestinatario = li.textContent.trim().toUpperCase();
-
-    if (nombreDestinatario.startsWith(letraInicial)) {
-      li.style.display = "";
-    } else {
-      li.style.display = "none";
-    }
-  }
-}
-
-menuSelect.addEventListener("change", calcularTotal);
-cantidadInput.addEventListener("input", calcularTotal);
-formaDePagoEfectivoInput.addEventListener("change", calcularTotal);
-formaDePago
+    // Calcular el costo y tiempo de entrega al cambiar el valor del select o la cantidad
+    menu.addEventListener("change", calcularCostoYTiempo);
+    cantidad.addEventListener("input", calcularCostoYTiempo);
+    tarjeta.addEventListener("click", calcularCostoYTiempo);
+    calcularTotalBtn.addEventListener("click", calcularCostoYTiempo);
+  });

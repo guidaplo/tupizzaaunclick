@@ -1,1 +1,31 @@
 
+{
+    "pizzas": [
+      {
+        "id": 1,
+        "nombre": "Muzzarella",
+        "precio": 1000
+      },
+      {
+        "id": 2,
+        "nombre": "Especial jamon",
+        "precio": 1500
+      },
+      {
+        "id": 3,
+        "nombre": "Especial morron",
+        "precio": 1500
+      },
+      {
+        "id": 4,
+        "nombre": "Especial anchoas",
+        "precio": 1500
+      },
+      {
+        "id": 5,
+        "nombre": "Completa jamon, morron y anchoas",
+        "precio": 1900
+      }
+    ]
+  }
+  
